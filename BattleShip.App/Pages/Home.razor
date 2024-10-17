@@ -7,5 +7,15 @@
 @inject GameState gameState
 
 <h3>Game State</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Appel à l'API lors de l'initialisation
+        await gameState.CallApiAndLogResultAsync();
+    }
+}
+
+
 @*<p>Player Score: @gameState.PlayerScore</p>*@
 @*<p>Opponent Score: @gameState.OpponentScore</p>*@
