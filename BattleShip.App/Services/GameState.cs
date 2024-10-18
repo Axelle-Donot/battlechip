@@ -1,10 +1,17 @@
-﻿namespace BattleShip.App.Services;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+using System.Text.Json;
+
+
+namespace BattleShip.App.Services;
 
 public class GameState
 {
     // Singleton Instance
     private static GameState? _instance = null;
     private static readonly object _lock = new object();
+    private readonly HttpClient _httpClient;
+
 
     // Grille du joueur (char[,])
     public char[,] PlayerGrid { get; private set; }
@@ -91,5 +98,37 @@ public class GameState
             return PlayerGrid[x, y] == 'B'; // 'B' représente un bateau
         }
         return false;
+    }
+
+    // Injection du HttpClient via constructeur
+    public GameState(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+        PlayerGrid = new char[gridSize, gridSize];
+        OpponentGrid = new bool?[gridSize, gridSize];
+        InitializePlayerGrid();
+    }
+
+    // Méthode pour appeler l'API
+    public async Task CallApiAndLogResultAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("http://localhost:5038/start");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                // Afficher la réponse dans la console
+                Console.WriteLine(result);
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred: {ex.Message}");
+        }
     }
 }
