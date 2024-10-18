@@ -8,6 +8,100 @@
 
 <h3>Game State</h3>
 
+<div class="grid-container">
+    <!-- Grille du joueur -->
+    <div>
+        <h4>Grille du joueur</h4>
+        <table class="battle-grid">
+            <!-- Première ligne avec les lettres -->
+            <tr>
+                <td></td> <!-- Case vide en haut à gauche -->
+                @for (char col = 'A'; col <= 'J'; col++)
+                {
+                    <td>@col</td>
+                }
+            </tr>
+
+            @for (int row = 1; row <= 10; row++)
+            {
+                <tr>
+                    <!-- Première colonne avec les chiffres -->
+                    <td>@row</td>
+                    @for (char col = 'A'; col <= 'J'; col++)
+                    {
+                        <td></td> <!-- Case vide -->
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+
+    <!-- Grille de l'adversaire -->
+    <div>
+        <h4>Grille de l'adversaire</h4>
+        <table class="battle-grid">
+            <!-- Première ligne avec les lettres -->
+            <tr>
+                <td></td> <!-- Case vide en haut à gauche -->
+                @for (char col = 'A'; col <= 'J'; col++)
+                {
+                    <td>@col</td>
+                }
+            </tr>
+
+            @for (int row = 1; row <= 10; row++)
+            {
+                <tr>
+                    <!-- Première colonne avec les chiffres -->
+                    <td>@row</td>
+                    @for (char col = 'A'; col <= 'J'; col++)
+                    {
+                        <td></td> <!-- Case vide -->
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<style>
+    .grid-container {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px;
+    }
+
+    .battle-grid {
+        border-collapse: collapse;
+        margin: 10px;
+    }
+
+    .battle-grid td {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #000;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 14px;
+        background-color: #f0f8ff; /* Couleur de fond pour chaque cellule */
+    }
+
+    .battle-grid td:first-child,
+    .battle-grid tr:first-child td {
+        background-color: #ffffff; /* Couleur blanche pour les cases légendes */
+        font-weight: bold;
+    }
+
+    .battle-grid td:hover {
+        background-color: #87ceeb; /* Couleur au survol */
+    }
+
+    h4 {
+        text-align: center;
+        font-family: Arial, sans-serif;
+    }
+</style>
+
 @code {
     protected override async Task OnInitializedAsync()
     {
@@ -15,7 +109,3 @@
         await gameState.CallApiAndLogResultAsync();
     }
 }
-
-
-@*<p>Player Score: @gameState.PlayerScore</p>*@
-@*<p>Opponent Score: @gameState.OpponentScore</p>*@
