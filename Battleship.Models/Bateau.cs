@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace BattleShip.Models
+﻿public class BateauPositions
 {
-    public class Bateau
-    {
-        [JsonPropertyName("positionsBateaux")]
-        public List<Dictionary<string, List<string>>> PositionsBateaux { get; set; }
-    }
+    public Dictionary<string, List<string>> PositionsBateaux { get; set; }
+}
+
+public class ApiResponse
+{
+    public List<BateauPositions> PositionsBateaux { get; set; }
 }

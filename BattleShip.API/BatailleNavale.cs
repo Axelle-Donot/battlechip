@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace BattleShip.API
 {
 
-    public class BatailleNavale
+    public class BatailleNavaleOLD
     {
         private const int TAILLE_GRILLE = 10; // Taille de la grille
         private static readonly (char lettre, int taille)[] bateaux = {
@@ -13,7 +13,7 @@ namespace BattleShip.API
         // Chaque bateau aura une lettre et une liste de positions au format "a1"
         public List<Dictionary<string, List<string>>> PositionsBateaux { get; private set; }
 
-        public BatailleNavale()
+        public BatailleNavaleOLD()
         {
             // Générer les positions des bateaux
             PositionsBateaux = GenererPositionsBateaux();
