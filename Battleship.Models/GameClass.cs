@@ -10,7 +10,7 @@ namespace BattleShip.Models
 {
     public class Game
     {
-        BatailleNavale[] grilles = { };
+        List<BatailleNavale> grilles = new List<BatailleNavale>();
         List<string> shotByIa = new List<string>();
         List<string> shotByPlayer = new List<string>();
         int toucheCount = 0;
@@ -31,16 +31,19 @@ namespace BattleShip.Models
              this.idParty = new string(stringChars);
         }
 
-        public (BatailleNavale[], string) startGame()
+        public (List<BatailleNavale>, string) startGame()
         {
             shotByIa.Clear();
             shotByPlayer.Clear();
             toucheCount = 0;
             toucheIaCount = 0;
             winner = "_NONE_";
+
+            grilles.Clear();
             
             Console.WriteLine("Chaîne aléatoire : " + idParty);
-            grilles = new BatailleNavale[] { new BatailleNavale(), new BatailleNavale() };
+             grilles.Add(new BatailleNavale());
+             grilles.Add (new BatailleNavale() );
             return (grilles, idParty );
         }
 

@@ -114,12 +114,50 @@ public class GameState
     {
         try
         {
+            Console.WriteLine("Calling API...");
+
             var response = await _httpClient.GetAsync("http://localhost:5038/start");
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadAsStringAsync();
-                // Afficher la réponse dans la console
-                Console.WriteLine(result);
+                var result = await response.Content.ReadFromJsonAsync<GrilleResponse>();
+                Console.WriteLine("API Response: " + result); 
+
+
+
+                // Désérialisation du JSON
+                //var bateauxData = JsonSerializer.Deserialize<List<BateauInfo>>(result);
+                //ApiResponse apiResponse = JsonSerializer.Deserialize<ApiResponse>(jsonResponse);
+
+                //Console.WriteLine("Bateau data : " + apiResponse);
+
+
+                
+                Console.WriteLine("Bateau data : ");
+                //Console.WriteLine(bateauxData[0].PositionsBateaux[0][bateau-A][0]); 
+
+                Console.WriteLine("---------------------------------------------------------------------");
+                
+                if (bateauxData != null && bateauxData.Count > 0)
+                {
+                    var positionsBateaux = bateauxData[0].PositionsBateaux;
+
+                    // Placer les bateaux sur la grille du joueur
+                    foreach (var bateau in positionsBateaux)
+                    {
+                        Console.WriteLine("Toto ");
+                        Console.WriteLine(bateau);
+                        foreach (var position in bateau.Values.SelectMany(x => x))
+                        {
+                            Console.WriteLine(position);
+                            Console.WriteLine("Placing boat at: " + position); // Affiche chaque position de bateau
+                            PlaceBoatOnPlayerGrid(position);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No boat data found in API response.");
+                }
             }
             else
             {
@@ -131,4 +169,53 @@ public class GameState
             Console.WriteLine($"Exception occurred: {ex.Message}");
         }
     }
+    private void PlaceBoatOnPlayerGrid(string position)
+    {
+        // Vérifie que la position est valide et contient au moins une lettre et un chiffre
+        if (string.IsNullOrEmpty(position) || position.Length < 2)
+        {
+            Console.WriteLine("Invalid boat position: " + position);
+            return;
+        }
+
+        // La première lettre représente la colonne (de 'a' à 'j')
+        char colChar = char.ToLower(position[0]); // Convertit en minuscule
+        int col = colChar - 'a'; // Convertit 'a'-'j' en 0-9
+
+        // Le reste représente le numéro de ligne (de '1' à '10')
+        string rowString = position.Substring(1);
+        if (int.TryParse(rowString, out int row))
+        {
+            row--; // Conversion en 0-based index (1 devient 0)
+        }
+        else
+        {
+            Console.WriteLine("Invalid row in position: " + position);
+            return;
+        }
+
+        // Vérifie que les indices sont valides
+        if (row >= 0 && row < gridSize && col >= 0 && col < gridSize)
+        {
+            Console.WriteLine($"Placing boat at grid position [Row: {row}, Col: {col}]");
+            PlayerGrid[row, col] = 'B'; // Marque la case avec un bateau
+        }
+        else
+        {
+            Console.WriteLine("Invalid grid position: " + position);
+        }
+
+        // Affiche le contenu de la grille après chaque placement
+        Console.WriteLine("Current PlayerGrid:");
+        for (int r = 0; r < gridSize; r++)
+        {
+            for (int c = 0; c < gridSize; c++)
+            {
+                Console.Write(PlayerGrid[r, c] + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+
+
 }

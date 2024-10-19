@@ -24,15 +24,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-<<<<<<< HEAD
 app.UseCors("AllowAllOrigins");
-BatailleNavale[] grilles = { };
-List<string> shotByIa = new List<string>();
-=======
+
 
 Game game = new Game();
 
->>>>>>> main
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -41,16 +37,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 
 
 app.MapGet("/start", () =>
 {
     string idParty;
-    (BatailleNavale[] grilles, idParty) = game.startGame();
-    return TypedResults.Ok(
-       new { grilles, idParty}
+    (List<BatailleNavale> grilles, idParty) = game.startGame();
+    return Results.Ok(
+       new GrilleResponse { Grilles = grilles, IdParty = idParty}
         );
 });
 

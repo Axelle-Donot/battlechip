@@ -11,7 +11,7 @@
 <div class="grid-container">
     <!-- Grille du joueur -->
     <div>
-        <h4>Grille du joueur</h4>
+    <h4>Grille du joueur</h4>
         <table class="battle-grid">
             <!-- Première ligne avec les lettres -->
             <tr>
@@ -22,14 +22,15 @@
                 }
             </tr>
 
-            @for (int row = 1; row <= 10; row++)
+            @for (int row = 0; row < 10; row++)
             {
                 <tr>
                     <!-- Première colonne avec les chiffres -->
-                    <td>@row</td>
+                    <td>@(row + 1)</td>
                     @for (char col = 'A'; col <= 'J'; col++)
                     {
-                        <td></td> <!-- Case vide -->
+                        var cellColor = gameState.PlayerGrid[row, col - 'A'] == 'B' ? "background-color: #ffcccb;" : ""; // Couleur pour les bateaux
+                        <td style="@cellColor"></td> <!-- Case colorée si un bateau est présent -->
                     }
                 </tr>
             }
