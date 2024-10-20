@@ -1,102 +1,123 @@
-﻿namespace Battleship.Models;
-    public class BatailleNavale
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Battleship.Models
 {
-    private const int TAILLE_GRILLE = 10; // Taille de la grille
-    private static readonly (char lettre, int taille)[] bateaux = {
-        ('A', 4), ('B', 3), ('C', 3), ('D', 2), ('E', 2), ('F', 1)
-    };
-
-    // Chaque bateau aura une lettre et une liste de positions au format "a1"
-    public List<Dictionary<string, List<string>>> PositionsBateaux { get; private set; }
-
-    public BatailleNavale()
+    public class BatailleNavale
     {
-        // Générer les positions des bateaux
-        PositionsBateaux = GenererPositionsBateaux();
-    }
+        private const int TAILLE_GRILLE = 10;
+        private static readonly (char lettre, int taille)[] bateaux = {
+            ('A', 4), ('B', 3), ('C', 3), ('D', 2), ('E', 2), ('F', 1)
+        };
 
-    private List<Dictionary<string, List<string>>> GenererPositionsBateaux()
-    {
-        List<Dictionary<string, List<string>>> positions = new List<Dictionary<string, List<string>>>();
-        char[,] grilleTemp = new char[TAILLE_GRILLE, TAILLE_GRILLE]; // Grille temporaire pour vérifier les conflits
+        public List<Bateau> Bateaux { get; private set; }
+        public Dictionary<string, List<string>> PositionsBateaux { get; private set; }
 
-        foreach (var bateau in bateaux)
+        // Constructeur pour le placement manuel
+        public BatailleNavale(List<Dictionary<string, List<string>>> positionsBateaux)
         {
-            bool bateauPlace = false;
+            Bateaux = new List<Bateau>();
+            PositionsBateaux = new Dictionary<string, List<string>>();
 
-            while (!bateauPlace)
+            foreach (var positionBateau in positionsBateaux)
             {
-                bool horizontal = Random.Shared.Next(2) == 0;
-                int ligne = Random.Shared.Next(TAILLE_GRILLE);
-                int colonne = Random.Shared.Next(TAILLE_GRILLE);
-
-                // Vérification de l'espace libre
-                if (horizontal && colonne + bateau.taille <= TAILLE_GRILLE)
+                foreach (var bateauPosition in positionBateau)
                 {
-                    bool espaceLibre = true;
-                    for (int i = 0; i < bateau.taille; i++)
+                    var lettre = bateauPosition.Key.Last();
+                    var taille = bateaux.First(b => b.lettre == lettre).taille;
+
+                    if (!PositionsBateaux.ContainsKey(bateauPosition.Key))
                     {
-                        if (grilleTemp[ligne, colonne + i] != '\0')
+                        PositionsBateaux[bateauPosition.Key] = bateauPosition.Value;
+                        var nouveauBateau = new Bateau(lettre, taille)
                         {
-                            espaceLibre = false;
-                            break;
-                        }
-                    }
-
-                    if (espaceLibre)
-                    {
-                        List<string> positionsBateau = new List<string>();
-
-                        // Ajout des positions dans la liste et marquage dans la grille temporaire
-                        for (int i = 0; i < bateau.taille; i++)
-                        {
-                            grilleTemp[ligne, colonne + i] = bateau.lettre;
-                            // Conversion des coordonnées (x, y) en format "a1", "b7", etc.
-                            char coordX = (char)('a' + ligne); // Conversion de l'index de ligne en lettre
-                            char coordY = (char)('1' + (colonne + i)); // Conversion de l'index de colonne en chiffre
-                            positionsBateau.Add($"{coordX}{coordY}"); // Ajouter la position au format "a1"
-                        }
-
-                        // Ajouter le bateau et ses positions au dictionnaire
-                        positions.Add(new Dictionary<string, List<string>> { { $"bateau-{bateau.lettre}", positionsBateau } });
-                        bateauPlace = true;
-                    }
-                }
-                else if (!horizontal && ligne + bateau.taille <= TAILLE_GRILLE)
-                {
-                    bool espaceLibre = true;
-                    for (int i = 0; i < bateau.taille; i++)
-                    {
-                        if (grilleTemp[ligne + i, colonne] != '\0')
-                        {
-                            espaceLibre = false;
-                            break;
-                        }
-                    }
-
-                    if (espaceLibre)
-                    {
-                        List<string> positionsBateau = new List<string>();
-
-                        // Ajout des positions dans la liste et marquage dans la grille temporaire
-                        for (int i = 0; i < bateau.taille; i++)
-                        {
-                            grilleTemp[ligne + i, colonne] = bateau.lettre;
-                            // Conversion des coordonnées (x, y) en format "a1", "b7", etc.
-                            char coordX = (char)('a' + (ligne + i)); // Conversion de l'index de ligne en lettre
-                            char coordY = (char)('1' + colonne); // Conversion de l'index de colonne en chiffre
-                            positionsBateau.Add($"{coordX}{coordY}"); // Ajouter la position au format "a1"
-                        }
-
-                        // Ajouter le bateau et ses positions au dictionnaire
-                        positions.Add(new Dictionary<string, List<string>> { { $"bateau-{bateau.lettre}", positionsBateau } });
-                        bateauPlace = true;
+                            Positions = bateauPosition.Value
+                        };
+                        Bateaux.Add(nouveauBateau);
                     }
                 }
             }
         }
 
-        return positions;
+        // Constructeur pour le placement aléatoire
+        public BatailleNavale()
+        {
+            Bateaux = new List<Bateau>();
+            PositionsBateaux = GenererPositionsAleatoires();
+        }
+
+        private Dictionary<string, List<string>> GenererPositionsAleatoires()
+        {
+            var positions = new Dictionary<string, List<string>>();
+            var grilleTemp = new char[TAILLE_GRILLE, TAILLE_GRILLE];
+
+            foreach (var bateau in bateaux)
+            {
+                bool bateauPlace = false;
+
+                while (!bateauPlace)
+                {
+                    bool horizontal = Random.Shared.Next(2) == 0;
+                    int ligne = Random.Shared.Next(TAILLE_GRILLE);
+                    int colonne = Random.Shared.Next(TAILLE_GRILLE);
+
+                    if (horizontal && colonne + bateau.taille <= TAILLE_GRILLE)
+                    {
+                        bool espaceLibre = true;
+                        for (int i = 0; i < bateau.taille; i++)
+                        {
+                            if (grilleTemp[ligne, colonne + i] != '\0')
+                            {
+                                espaceLibre = false;
+                                break;
+                            }
+                        }
+
+                        if (espaceLibre)
+                        {
+                            List<string> positionsBateau = new List<string>();
+                            for (int i = 0; i < bateau.taille; i++)
+                            {
+                                grilleTemp[ligne, colonne + i] = bateau.lettre;
+                                char coordX = (char)('a' + ligne);
+                                char coordY = (char)('1' + (colonne + i));
+                                positionsBateau.Add($"{coordX}{coordY}");
+                            }
+                            positions.Add($"bateau-{bateau.lettre}", positionsBateau);
+                            bateauPlace = true;
+                        }
+                    }
+                    else if (!horizontal && ligne + bateau.taille <= TAILLE_GRILLE)
+                    {
+                        bool espaceLibre = true;
+                        for (int i = 0; i < bateau.taille; i++)
+                        {
+                            if (grilleTemp[ligne + i, colonne] != '\0')
+                            {
+                                espaceLibre = false;
+                                break;
+                            }
+                        }
+
+                        if (espaceLibre)
+                        {
+                            List<string> positionsBateau = new List<string>();
+                            for (int i = 0; i < bateau.taille; i++)
+                            {
+                                grilleTemp[ligne + i, colonne] = bateau.lettre;
+                                char coordX = (char)('a' + (ligne + i));
+                                char coordY = (char)('1' + colonne);
+                                positionsBateau.Add($"{coordX}{coordY}");
+                            }
+                            positions.Add($"bateau-{bateau.lettre}", positionsBateau);
+                            bateauPlace = true;
+                        }
+                    }
+                }
+            }
+
+            return positions;
+        }
     }
 }
-

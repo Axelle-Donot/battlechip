@@ -2,21 +2,8 @@ using BattleShip.API;
 using Battleship.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
-using BattleShip.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllOrigins",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
-});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -24,15 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-<<<<<<< HEAD
-app.UseCors("AllowAllOrigins");
-BatailleNavale[] grilles = { };
-List<string> shotByIa = new List<string>();
-=======
 
 Game game = new Game();
-
->>>>>>> main
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -43,16 +23,32 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
-
-app.MapGet("/start", () =>
+app.MapPost("/start", ([FromBody] PositionsBateauxRequest body) =>
 {
-    string idParty;
-    (BatailleNavale[] grilles, idParty) = game.startGame();
+    // Appeler la méthode startGame pour créer les deux grilles (manuelle et aléatoire)
+    var (grilles, idParty) = game.startGame(body.PositionsBateaux);
+
+    // Retourner les deux grilles et l'id de la partie
     return TypedResults.Ok(
-       new { grilles, idParty}
-        );
+    new
+    {
+        grilles = new[]
+        {
+            new
+            {
+                positionsBateaux = grilles[0].PositionsBateaux
+            },
+            new
+            {
+                positionsBateaux = grilles[1].PositionsBateaux
+            }
+        },
+        idParty
+    }
+);
+
 });
+
 
 app.MapGet("/atk/{x}/{y}/ia", ([FromRoute] string x, [FromRoute] string y) =>
 {
