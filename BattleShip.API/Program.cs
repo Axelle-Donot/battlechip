@@ -2,7 +2,6 @@ using BattleShip.API;
 using Battleship.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
-using BattleShip.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +14,6 @@ var app = builder.Build();
 
 Game game = new Game();
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -25,16 +23,32 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
-
-app.MapGet("/start", () =>
+app.MapPost("/start", ([FromBody] PositionsBateauxRequest body) =>
 {
-    string idParty;
-    (BatailleNavale[] grilles, idParty) = game.startGame();
+    // Appeler la méthode startGame pour créer les deux grilles (manuelle et aléatoire)
+    var (grilles, idParty) = game.startGame(body.PositionsBateaux);
+
+    // Retourner les deux grilles et l'id de la partie
     return TypedResults.Ok(
-       new { grilles, idParty}
-        );
+    new
+    {
+        grilles = new[]
+        {
+            new
+            {
+                positionsBateaux = grilles[0].PositionsBateaux
+            },
+            new
+            {
+                positionsBateaux = grilles[1].PositionsBateaux
+            }
+        },
+        idParty
+    }
+);
+
 });
+
 
 app.MapGet("/atk/{x}/{y}/ia", ([FromRoute] string x, [FromRoute] string y) =>
 {

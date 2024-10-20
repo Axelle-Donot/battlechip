@@ -6,9 +6,9 @@ Bataille Navale
 
 [x] API attaque joueur + IA
 
-[ ] faire une seul api pour l'attaque , joueur attaque si tous les bateaux sont coulés alors fin partie retour info front, sinon ia attaque pareil si gagne retour front , sinon retour front avec result attaque ia et user
+[X] faire une seul api pour l'attaque , joueur attaque si tous les bateaux sont coulés alors fin partie retour info front, sinon ia attaque pareil si gagne retour front , sinon retour front avec result attaque ia et user
 
-[ ] Généré un id de partie
+[X] Généré un id de partie
 
 [ ] toute les données doivent etre validée (anticorruption layer) et la sécurité avec FluentValidation
 pour créer un validateur , faire une classe qui hérite de "AbstractValidaton < Model >" dans le constructeur implementer les regles avec ruleFor
@@ -29,3 +29,6 @@ Valider et faire le nécessaire pour le modèlle AttackRequest
 [ ] Gestion sécurité et user avec Auth0
 
 [ ] faire 3 niveau : facile petite grille ia conteneur  / Moyen petite grille ia atk perimetre / Difficile grande grille ia perimetre
+
+
+
